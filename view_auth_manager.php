@@ -12,11 +12,17 @@
   global $vam_db_version;
   $vam_db_version = "0.1.0";
 
-  require_once dirname(__FILE__) . '/db/migrate/create_progresses.php';
+  require_once(dirname(__FILE__) . "/db/migrate/create_progresses.php");
+  require_once(dirname(__FILE__) . "/db/seeds.php");
 
   function migrate() {
     $create_progresses = new CreateProgresses;
     $create_progresses -> change();
+  }
+
+  function seed() {
+    $seed = new Seed;
+    $seed -> import();
   }
 
   function drop() {
@@ -28,5 +34,6 @@
   }
 
   register_activation_hook( __FILE__, "migrate" );
+  register_activation_hook( __FILE__, "seed" );
   register_deactivation_hook( __FILE__, "drop" );
 ?>
