@@ -1,5 +1,5 @@
 <?php
-require_once("./vendor/autoload.php");
+require_once(ABSPATH . "wp-content/plugins/view_auth_manager/vendor/autoload.php");
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 

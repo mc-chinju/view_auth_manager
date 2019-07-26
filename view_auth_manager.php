@@ -9,28 +9,21 @@
     License: Apache Lisence 2.0
   */
 
-  global $vam_db_version;
-  $vam_db_version = "0.1.0";
-
   require_once(dirname(__FILE__) . "/db/migrate/create_progresses.php");
+  require_once(dirname(__FILE__) . "/db/drop_dbs.php");
   require_once(dirname(__FILE__) . "/db/seeds.php");
+  require_once(dirname(__FILE__) . "/config/database.php");
 
   function migrate() {
-    $create_progresses = new CreateProgresses;
-    $create_progresses -> change();
+    CreateProgresses::change();
   }
 
   function seed() {
-    $seed = new Seed;
-    $seed -> import();
+    Seed::import();
   }
 
   function drop() {
-    global $wpdb;
-    $table_name = $wpdb -> prefix . "vam_progresses";
-    $sql = "DROP TABLE IF EXISTS $table_name;";
-    $wpdb -> query($sql);
-    delete_option($vam_db_version);
+    DropDbs::execute();
   }
 
   register_activation_hook( __FILE__, "migrate" );
