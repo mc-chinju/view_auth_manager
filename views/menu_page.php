@@ -1,34 +1,48 @@
 <?php
-  $checked = get_site_option( 'active_twitter' );
-  if( empty( $checked ) ){
-    $checked = '';
-  } else {
-    $checked = 'checked="checked"';
-  }
+  $postsPerPage = 20;
+  $postOffset = $paged * $postsPerPage;
+
+  $args = array(
+    "paged" => $paged,
+    "posts_per_page" => $postsPerPage,
+    "offset" => $postOffset,
+    "orderby" => $orderby,
+    "order" => $order,
+  );
 ?>
 
 <div class="wrap">
   <h2>View Auth Manager</h2>
-
-  <form method="post" action="options.php">
+  <table class="wp-list-table widefat fixed striped posts">
+    <thead>
+      <tr>
+        <td>Title</td>
+        <td>Post Status</td>
+        <td>Tag</td>
+        <td>View Auth Level</td>
+        <td>Edit</td>
+      </tr>
+    </thead>
+    <tbody>
 
     <?php
-      settings_fields( "hello-world-group" );
-      do_settings_sections( "default" );
+      $myposts = new WP_Query($args);
+      if ($myposts -> have_posts()) {
+        foreach($myposts -> posts as $post){
+          $title = $post -> post_title;
+          $status = $post -> post_status;
+          $view_auth_level = ($post -> view_auth_level) ?: 0;
+
+          echo("<tr>
+            <td> $title </td>
+            <td> $status </td>
+            <td> any tags </td>
+            <td> $view_auth_level </td>
+            <td><a>Edit</a></td>
+          </tr>");
+        }
+      }
     ?>
-
-    <table class="form-table">
-      <tbody>
-        <tr>
-          <th scope="row"><label for="active_twitter">Twitter</label></th>
-          <td>
-            <input type="hidden" name="active_twitter" value="0">
-            <label for="active_twitter"><input type="checkbox" id="active_twitter" name="active_twitter" size="30" value="1"<?php echo $checked; ?>/>Twitter</input></label>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
-    <?php submit_button(); ?>
-  </form>
- </div>
+    </tbody>
+  </table>
+</div>
