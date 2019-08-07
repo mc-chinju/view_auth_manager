@@ -18,7 +18,7 @@
       <tr>
         <td>Title</td>
         <td>Post Status</td>
-        <td>Tag</td>
+        <td>View Auth Tag or Taxonomy</td>
         <td>View Auth Level</td>
         <td>Edit</td>
       </tr>
@@ -26,17 +26,24 @@
     <tbody>
 
     <?php
+      use Illuminate\Database\Capsule\Manager as Capsule;
+      $capsule = new Capsule;
+      $terms = $capsule::table("terms")->pluck("name", "term_id");
+
       $myposts = new WP_Query($args);
+
       if ($myposts -> have_posts()) {
         foreach($myposts -> posts as $post){
           $title = $post -> post_title;
           $status = $post -> post_status;
           $view_auth_level = ($post -> view_auth_level) ?: 0;
+          $view_auth_term_id = ($post -> view_auth_term_id);
+          $term = $terms[$view_auth_term_id];
 
           echo("<tr>
             <td> $title </td>
             <td> $status </td>
-            <td> any tags </td>
+            <td> $term </td>
             <td> $view_auth_level </td>
             <td><a>Edit</a></td>
           </tr>");
