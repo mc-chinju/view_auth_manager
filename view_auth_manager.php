@@ -36,6 +36,11 @@
       "view-auth-manager",
       "display_plugin_admin_page"
     );
+
+    register_setting(
+      "view_auth_settings",
+      "post_has_the_term"
+    );
   }
 
   function display_plugin_admin_page() {
