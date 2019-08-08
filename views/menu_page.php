@@ -1,16 +1,3 @@
-<?php
-  $postsPerPage = 20;
-  $postOffset = $paged * $postsPerPage;
-
-  $args = array(
-    "paged" => $paged,
-    "posts_per_page" => $postsPerPage,
-    "offset" => $postOffset,
-    "orderby" => $orderby,
-    "order" => $order,
-  );
-?>
-
 <div class="wrap">
   <h2>View Auth Manager</h2>
   <table class="wp-list-table widefat fixed striped posts">
@@ -30,6 +17,8 @@
       $capsule = new Capsule;
       $terms = $capsule::table("terms")->pluck("name", "term_id");
 
+      // TODO: pagination
+      $args = array("posts_per_page" => -1);
       $myposts = new WP_Query($args);
 
       if ($myposts -> have_posts()) {

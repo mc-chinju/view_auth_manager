@@ -34,12 +34,6 @@
       "view-auth-manager",
       "display_plugin_admin_page"
     );
-
-    // register_setting(
-    //   "hello-world-group",
-    //   "active_twitter",
-    //   "active_twitter_validation"
-    // );
   }
 
   function display_plugin_admin_page() {
