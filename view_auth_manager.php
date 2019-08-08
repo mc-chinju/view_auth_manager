@@ -61,6 +61,13 @@
       $view_auth_term_id_postmeta = $capsule::table("postmeta")->where("post_id", $post_id)->where("meta_key", "view_auth_term_id")->first();
       $view_auth_term_id = $view_auth_term_id_postmeta ? $view_auth_term_id_postmeta->meta_value : null;
 
+      $phtm_value = get_site_option("post_has_the_term") || 0;
+      if ($phtm_value) {
+        $term_ids = $capsule::table("term_relationships")->where("object_id", $post_id)->pluck("term_taxonomy_id")->all();
+        $key = array_search($view_auth_term_id, $term_ids);
+        $view_auth_term_id = $key ? $term_ids[$key] : null;
+      }
+
       $progress = $capsule::table("vam_progresses")->where("user_id", $current_user->ID)->where("term_id", $view_auth_term_id)->first();
       $progress_level = $progress->level ?: 0;
 
