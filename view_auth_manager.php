@@ -26,7 +26,23 @@
     DropDbs::execute();
   }
 
+  function add_plugin_admin_menu() {
+    add_options_page(
+      "View Auth Manager",
+      "View Auth Manager",
+      "administrator",
+      "view-auth-manager",
+      "display_plugin_admin_page"
+    );
+  }
+
+  function display_plugin_admin_page() {
+    include_once( "views/menu_page.php" );
+    wp_enqueue_style( "menu_page", plugins_url( "style/menu_page.css", __FILE__ ) );
+  }
+
   register_activation_hook( __FILE__, "migrate" );
   register_activation_hook( __FILE__, "seed" );
   register_deactivation_hook( __FILE__, "drop" );
+  add_action( "admin_menu", "add_plugin_admin_menu" );
 ?>

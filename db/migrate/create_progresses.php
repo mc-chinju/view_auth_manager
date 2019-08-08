@@ -11,7 +11,7 @@
           $table->bigIncrements('id');
           $table->Integer('level')->default(0);
           $table->bigInteger('user_id');
-          $table->bigInteger('term_taxonomy_id');
+          $table->bigInteger('term_id');
           $table->timestamps();
         });
       }
