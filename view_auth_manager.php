@@ -82,9 +82,18 @@
     }
   }
 
+  function prepare_ajaxurl() {
+    ?>
+      <script>
+        const ajaxurl = "<?php echo admin_url('admin-ajax.php'); ?>"";
+      </script>
+    <?php
+  }
+
   register_activation_hook( __FILE__, "migrate" );
   register_activation_hook( __FILE__, "seed" );
   register_deactivation_hook( __FILE__, "drop" );
   add_action( "admin_menu", "add_plugin_admin_menu" );
   add_action( "template_redirect", "before_action_show_post" );
+  add_action( "wp_head", "prepare_ajaxurl", 1 );
 ?>
