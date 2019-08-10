@@ -66,11 +66,11 @@
 
       if ($myposts -> have_posts()) {
         foreach($myposts -> posts as $key => $post){
+          $id = $post -> ID;
           $title = $post -> post_title;
           $status = $post -> post_status;
           $view_auth_level = ($post -> view_auth_level) ?: 0;
           $view_auth_term_id = ($post -> view_auth_term_id);
-          $term = $terms[$view_auth_term_id];
           $form_id = "form_" . "$key";
           echo("<form id='$form_id' method='post'>
             <tr>
@@ -117,7 +117,10 @@
               <td>
                 <input name='view_auth_level' type='number' value='$view_auth_level' from='$form_id'/>
               </td>
-              <td><input type='submit' form='$form_id' value='Save'/></td>
+              <td>
+                <input type='hidden' name='id' value='$id'/>
+                <input type='submit' form='$form_id' value='Save'/>
+              </td>
             </tr>
           </form>");
         }
