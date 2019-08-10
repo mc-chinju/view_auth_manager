@@ -27,10 +27,11 @@
     <?php submit_button();?>
   </form>
 
-  <h3>Posts meta data</h3>
+  <h3>Posts data</h3>
   <table class="wp-list-table widefat fixed striped posts">
     <thead>
       <tr>
+        <td style="width: 30px;">ID</td>
         <td>Title</td>
         <td>Post Status</td>
         <td>View Auth Tag or Taxonomy</td>
@@ -74,6 +75,7 @@
           $form_id = "form_" . "$key";
           echo("<form id='$form_id' method='post'>
             <tr>
+              <td> $id </td>
               <td> $title </td>
               <td> $status </td>
               <td>
