@@ -119,7 +119,7 @@
               </td>
               <td>
                 <input type='hidden' name='id' value='$id'/>
-                <input type='submit' form='$form_id' value='Save'/>
+                <input type='submit' form='$form_id' value='Save' class='button button-primary'/>
               </td>
             </tr>
           </form>");

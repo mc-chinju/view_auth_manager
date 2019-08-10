@@ -83,8 +83,6 @@
   }
 
   function enqueue_vam_ajax_script() {
-    // if ( is_admin() )
-    wp_enqueue_script( "jquery" );
     wp_enqueue_script("ajax-script",
       plugins_url("/js/update_post_meta.js", __FILE__ ),
       array( "jquery" ),
@@ -101,14 +99,23 @@
   function update_post_metadata(){
     check_ajax_referer("vam_ajax", "nonce");
 
+    $id = $_POST["id"];
     if (empty($_POST["view_auth_term_id"])) {
       delete_post_meta($_POST["id"], "view_auth_term_id");
       delete_post_meta($_POST["id"], "view_auth_level");
+      echo("Delete! post_id: $id metadata");
     } else {
       update_post_meta($_POST["id"], "view_auth_term_id", $_POST["view_auth_term_id"]);
       update_post_meta($_POST["id"], "view_auth_level", $_POST["view_auth_level"]);
+      echo("Updated! post_id: $id metadata");
     }
     die();
+  }
+
+  function set_toastr_cdn() {
+    wp_enqueue_style( "toastr_css", "https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.css" , array(), null, 'all');
+    wp_enqueue_script( "toastr_js", "https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js", array(), false, true);
+    wp_enqueue_script( "toastr_options_js", plugins_url("/js/toastr_options.js", __FILE__ ), array( "jquery" ), false, true);
   }
 
   add_action( "wp_ajax_update_post_metadata", "update_post_metadata" );
@@ -120,4 +127,5 @@
   add_action( "admin_menu", "add_plugin_admin_menu" );
   add_action( "template_redirect", "before_action_show_post" );
   add_action( "admin_enqueue_scripts", "enqueue_vam_ajax_script" );
+  add_action( "admin_enqueue_scripts", "set_toastr_cdn" );
 ?>

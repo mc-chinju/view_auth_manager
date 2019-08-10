@@ -16,13 +16,11 @@ jQuery(function($) {
       data: fd,
       contentType: false,
       processData: false,
-      success: function(data) {
-        // TODO: toast
-        console.log(`Success: ${data}`);
+      success: function(message) {
+        toastr.success(message);
       },
       error: function(e) {
-        // TODO: toast
-        console.log(`Error: {e}`);
+        toastr.error(`Error: ${e}`);
       }
     });
     return false;
