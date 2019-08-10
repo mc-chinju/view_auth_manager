@@ -27,15 +27,16 @@
     <?php submit_button();?>
   </form>
 
-  <h3>Posts meta data</h3>
+  <h3>Posts data</h3>
   <table class="wp-list-table widefat fixed striped posts">
     <thead>
       <tr>
+        <td style="width: 30px;">ID</td>
         <td>Title</td>
         <td>Post Status</td>
         <td>View Auth Tag or Taxonomy</td>
         <td>View Auth Level</td>
-        <td>Edit</td>
+        <td></td>
       </tr>
     </thead>
     <tbody>
@@ -43,27 +44,87 @@
     <?php
       use Illuminate\Database\Capsule\Manager as Capsule;
       $capsule = new Capsule;
-      $terms = $capsule::table("terms")->pluck("name", "term_id");
+
+      $terms = $capsule::table("terms")->pluck("name", "term_id")->all();
+      $category_term_ids = $capsule::table("term_taxonomy")->where("taxonomy", "category")->pluck("term_id")->all();
+      $tag_term_ids = $capsule::table("term_taxonomy")->where("taxonomy", "post_tag")->pluck("term_id")->all();
+      $category_terms = array();
+      $tag_terms = array();
+      $other_terms = array();
+      foreach($terms as $_term_id => $_name) {
+        if (in_array($_term_id, $category_term_ids)) {
+          $category_terms += array($_term_id => $_name);
+        } elseif(in_array($_term_id, $tag_term_ids)) {
+          $tag_terms += array($_term_id => $_name);
+        } else {
+          $other_terms += array($_term_id => $_name);
+        }
+      };
 
       // TODO: pagination
       $args = array("posts_per_page" => -1);
       $myposts = new WP_Query($args);
 
       if ($myposts -> have_posts()) {
-        foreach($myposts -> posts as $post){
+        foreach($myposts -> posts as $key => $post){
+          $id = $post -> ID;
           $title = $post -> post_title;
           $status = $post -> post_status;
           $view_auth_level = ($post -> view_auth_level) ?: 0;
           $view_auth_term_id = ($post -> view_auth_term_id);
-          $term = $terms[$view_auth_term_id];
-
-          echo("<tr>
-            <td> $title </td>
-            <td> $status </td>
-            <td> $term </td>
-            <td> $view_auth_level </td>
-            <td><a>Edit</a></td>
-          </tr>");
+          $form_id = "form_" . "$key";
+          echo("<form id='$form_id' method='post'>
+            <tr>
+              <td> $id </td>
+              <td> $title </td>
+              <td> $status </td>
+              <td>
+                <select name='view_auth_term_id' form='$form_id'>
+                  <option></option>
+                  <optgroup label='Tags'>
+          ");
+          foreach($tag_terms as $_term_id => $_name) {
+            if ($view_auth_term_id == $_term_id) {
+              echo("<option value='$_term_id' selected>$_name</option>");
+            } else {
+              echo("<option value='$_term_id'>$_name</option>");
+            }
+          }
+          echo("
+                  </optgroup>
+                  <optgroup label ='Categories'>
+          ");
+          foreach($category_terms as $_term_id => $_name) {
+            if ($view_auth_term_id == $_term_id) {
+              echo("<option value='$_term_id' selected>$_name</option>");
+            } else {
+              echo("<option value='$_term_id'>$_name</option>");
+            }
+          }
+          echo("
+                  </optgroup>
+                  <optgroup label ='Others'>
+          ");
+          foreach($other_terms as $_term_id => $_name) {
+            if ($view_auth_term_id == $_term_id) {
+              echo("<option value='$_term_id' selected>$_name</option>");
+            } else {
+              echo("<option value='$_term_id'>$_name</option>");
+            }
+          }
+          echo("
+                  </optgroup>
+                </select>
+              </td>
+              <td>
+                <input name='view_auth_level' type='number' value='$view_auth_level' from='$form_id'/>
+              </td>
+              <td>
+                <input type='hidden' name='id' value='$id'/>
+                <input type='submit' form='$form_id' value='Save' class='button button-primary'/>
+              </td>
+            </tr>
+          </form>");
         }
       }
     ?>
