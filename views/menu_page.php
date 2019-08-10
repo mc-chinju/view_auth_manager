@@ -35,7 +35,7 @@
         <td>Post Status</td>
         <td>View Auth Tag or Taxonomy</td>
         <td>View Auth Level</td>
-        <td>Edit</td>
+        <td></td>
       </tr>
     </thead>
     <tbody>
@@ -77,7 +77,7 @@
               <td> $title </td>
               <td> $status </td>
               <td>
-                <select name='view_auth_term_id'>
+                <select name='view_auth_term_id' form='$form_id'>
                   <option></option>
                   <optgroup label='Tags'>
           ");
@@ -115,9 +115,9 @@
                 </select>
               </td>
               <td>
-                <input name='view_auth_level' type='number' value='$view_auth_level' required></input>
+                <input name='view_auth_level' type='number' value='$view_auth_level' from='$form_id'/>
               </td>
-              <td><a>Edit</a></td>
+              <td><input type='submit' form='$form_id' value='Save'/></td>
             </tr>
           </form>");
         }
