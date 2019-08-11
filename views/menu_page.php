@@ -72,7 +72,7 @@
           $status = $post -> post_status;
           $view_auth_level = ($post -> view_auth_level) ?: 0;
           $view_auth_term_id = ($post -> view_auth_term_id);
-          $form_id = "form_" . "$key";
+          $form_id = "vam_form_" . "$key";
           echo("<form id='$form_id' method='post'>
             <tr>
               <td> $id </td>
