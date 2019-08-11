@@ -1,5 +1,5 @@
 jQuery(function($) {
-  $("[id^=form_]").submit(function(e) {
+  $("[id^=vam_form_]").submit(function(e) {
     e.preventDefault();
     const fd = new FormData(this);
 
