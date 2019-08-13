@@ -76,7 +76,8 @@
         // Noop
       } else {
         // TODO: Access accessable term_id's latest post
-        wp_safe_redirect(home_url(), 301);
+        $redirect_url = home_url() . "?vam_redirect=true";
+        wp_safe_redirect($redirect_url, 301);
         exit;
       }
     }
@@ -115,7 +116,17 @@
   function set_toastr_cdn() {
     wp_enqueue_style( "toastr_css", "https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.css" , array(), null, 'all');
     wp_enqueue_script( "toastr_js", "https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js", array(), false, true);
+  }
+
+  function set_toastr_for_admin() {
+    set_toastr_cdn();
     wp_enqueue_script( "toastr_options_js", plugins_url("/js/toastr_options.js", __FILE__ ), array( "jquery" ), false, true);
+  }
+
+  function set_toastr_for_general() {
+    set_toastr_cdn();
+    wp_enqueue_script( "toastr_options_js", plugins_url("/js/toastr_options.js", __FILE__ ), array( "jquery" ), false, true);
+    wp_enqueue_script( "toastr_redirected_js", plugins_url("js/toastr_redirected.js", __FILE__), array( "jquery" ), false, true);
   }
 
   add_action( "wp_ajax_update_post_metadata", "update_post_metadata" );
@@ -127,5 +138,6 @@
   add_action( "admin_menu", "add_plugin_admin_menu" );
   add_action( "template_redirect", "before_action_show_post" );
   add_action( "admin_enqueue_scripts", "enqueue_vam_ajax_script" );
-  add_action( "admin_enqueue_scripts", "set_toastr_cdn" );
+  add_action( "admin_enqueue_scripts", "set_toastr_for_admin" );
+  add_action( "wp_enqueue_scripts", "set_toastr_for_general");
 ?>
