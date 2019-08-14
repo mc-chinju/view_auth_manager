@@ -124,6 +124,17 @@ function set_toastr_for_general()
     wp_enqueue_script("toastr_redirected_js", plugins_url("js/toastr_redirected.js", __FILE__), array( "jquery" ), false, true);
 }
 
+function set_authentication_options() {
+    if (is_singular()) {
+        wp_register_script("vam_authentication_options", plugins_url("js/vam_authentication_options.js", __FILE__), array ( "jquery" ), null, true);
+        wp_localize_script("vam_authentication_options", "VamAuthenticationSettings", array(
+            "post_id" => get_the_ID(),
+            "nonce" => wp_create_nonce( "wp_rest" )
+        ));
+        wp_enqueue_script("vam_authentication_options");
+    }
+}
+
 function add_custom_endpoint() {
     register_rest_route("vam/v1", "/current/progresses", array(
         "methods" => WP_REST_Server::EDITABLE,
@@ -180,25 +191,29 @@ function progress_level($data) {
     $view_auth_term_id = $view_auth_term_id_postmeta ? $view_auth_term_id_postmeta->meta_value : null;
 
     $current_user = wp_get_current_user();
-
-    // TODO: API Authentication( https://developer.wordpress.org/rest-api/using-the-rest-api/authentication/ )
     $current_user_id = $current_user->ID;
 
-    if ($view_auth_term_id && $current_user_id) {
-        $progress = $capsule::table("vam_progresses")->updateOrInsert(
-            [
-                "term_id" => $view_auth_term_id,
-                "user_id" => $current_user_id,
-            ], [
-                "level" => $next_level,
-            ]
-        );
+    if ($current_user_id) {
+        if ($view_auth_term_id) {
+            $progress = $capsule::table("vam_progresses")->updateOrInsert(
+                [
+                    "term_id" => $view_auth_term_id,
+                    "user_id" => $current_user_id,
+                ], [
+                    "level" => $next_level,
+                ]
+            );
+            $data = [ "message" => "view_auth_term_id: $view_auth_term_id level $view_auth_level increase to $next_level." ];
+            $response = new WP_REST_Response($data, 200);
+        } else {
+            $data = [ "message" => "The post is unset view_auth_manager's metadata." ];
+            $response = new WP_REST_Response($data, 200);
+        }
+    } else {
+        $data = [ "message" => "You do not have permission to perform the operation." ];
+        $response = new WP_REST_Response($data, 404);
     }
 
-    $response = new WP_REST_Response( $body );
-    $response->set_status( 201 );
-    $domain = (empty($_SERVER["HTTPS"]) ? "http://" : "https://") . $_SERVER["HTTP_HOST"];
-    $response->header( "Location", $domain );
     return $response;
 }
 
@@ -212,4 +227,5 @@ add_action("admin_enqueue_scripts", "set_toastr_for_admin");
 add_action("admin_enqueue_scripts", "enqueue_vam_ajax_script");
 add_action("wp_ajax_update_post_metadata", "update_post_metadata");
 add_action("wp_ajax_nopriv_update_post_metadata", "update_post_metadata");
+add_action("wp_enqueue_scripts", "set_authentication_options");
 add_action("rest_api_init", "add_custom_endpoint");
