@@ -75,7 +75,11 @@ function before_action_show_post()
         }
 
         $progress = $capsule::table("vam_progresses")->where("user_id", $current_user->ID)->where("term_id", $view_auth_term_id)->first();
-        $progress_level = $progress->level ?: 0;
+        if ($progress) {
+            $progress_level = $progress->level ?: 0;
+        } else {
+            $progress_level = 0;
+        }
 
         // readable check
         if ((is_null($view_auth_term_id)) || ($progress_level >= $view_auth_level)) {
@@ -141,6 +145,53 @@ function set_toastr_for_general()
     wp_enqueue_script("toastr_redirected_js", plugins_url("js/toastr_redirected.js", __FILE__), array( "jquery" ), false, true);
 }
 
+function add_custom_endpoint() {
+    register_rest_route("vam/v1", "/current/progresses", array(
+        "methods" => WP_REST_Server::EDITABLE,
+        "callback" => "progress_level",
+        "args" => array(
+            "post_id" => array(
+                "required" => true,
+                "type" => "number"
+            )
+        )
+    ));
+}
+
+function progress_level($data) {
+    $body = $data -> get_params();
+    $capsule = new Capsule;
+    $view_auth_level_postmeta = $capsule::table("postmeta")->where("post_id", $body["post_id"])->where("meta_key", "view_auth_level")->first();
+    $view_auth_level = $view_auth_level_postmeta ? $view_auth_level_postmeta->meta_value : 0;
+    $next_level = $view_auth_level + 1;
+
+    $view_auth_term_id_postmeta = $capsule::table("postmeta")->where("post_id", $body["post_id"])->where("meta_key", "view_auth_term_id")->first();
+    $view_auth_term_id = $view_auth_term_id_postmeta ? $view_auth_term_id_postmeta->meta_value : null;
+
+    $current_user = wp_get_current_user();
+
+    // TODO: API Authentication( https://developer.wordpress.org/rest-api/using-the-rest-api/authentication/ )
+    // $current_user_id = 1;
+    $current_user_id = $current_user->ID;
+
+    if ($view_auth_term_id && $current_user_id) {
+        $progress = $capsule::table("vam_progresses")->updateOrInsert(
+            [
+                "term_id" => $view_auth_term_id,
+                "user_id" => $current_user_id,
+            ], [
+                "level" => $next_level,
+            ]
+        );
+    }
+
+    $response = new WP_REST_Response( $progress );
+    $response->set_status( 201 );
+    $domain = (empty($_SERVER["HTTPS"]) ? "http://" : "https://") . $_SERVER["HTTP_HOST"];
+    $response->header( "Location", $domain );
+    return $response;
+}
+
 register_activation_hook(__FILE__, "migrate");
 register_activation_hook(__FILE__, "seed");
 register_deactivation_hook(__FILE__, "drop");
@@ -151,3 +202,4 @@ add_action("admin_enqueue_scripts", "set_toastr_for_admin");
 add_action("admin_enqueue_scripts", "enqueue_vam_ajax_script");
 add_action("wp_ajax_update_post_metadata", "update_post_metadata");
 add_action("wp_ajax_nopriv_update_post_metadata", "update_post_metadata");
+add_action("rest_api_init", "add_custom_endpoint");
