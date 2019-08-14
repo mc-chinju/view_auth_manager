@@ -124,18 +124,20 @@ function set_toastr_for_general()
     wp_enqueue_script("toastr_redirected_js", plugins_url("js/toastr_redirected.js", __FILE__), array( "jquery" ), false, true);
 }
 
-function set_authentication_options() {
+function set_authentication_options()
+{
     if (is_singular()) {
-        wp_register_script("vam_authentication_options", plugins_url("js/vam_authentication_options.js", __FILE__), array ( "jquery" ), null, true);
+        wp_register_script("vam_authentication_options", plugins_url("js/vam_authentication_options.js", __FILE__), array( "jquery" ), null, true);
         wp_localize_script("vam_authentication_options", "VamAuthenticationSettings", array(
             "post_id" => get_the_ID(),
-            "nonce" => wp_create_nonce( "wp_rest" )
+            "nonce" => wp_create_nonce("wp_rest")
         ));
         wp_enqueue_script("vam_authentication_options");
     }
 }
 
-function add_custom_endpoint() {
+function add_custom_endpoint()
+{
     register_rest_route("vam/v1", "/current/progresses", array(
         "methods" => WP_REST_Server::EDITABLE,
         "permission_callback" => "is_readable_post_callback",
@@ -149,7 +151,8 @@ function add_custom_endpoint() {
     ));
 }
 
-function is_readable_post_callback($data) {
+function is_readable_post_callback($data)
+{
     $body = $data -> get_params();
     $current_user = wp_get_current_user();
     $current_user_id = $current_user->ID;
@@ -158,7 +161,8 @@ function is_readable_post_callback($data) {
 }
 
 // want private method
-function is_readable_post($post_id, $current_user_id) {
+function is_readable_post($post_id, $current_user_id)
+{
     $capsule = new Capsule;
 
     $view_auth_level_postmeta = $capsule::table("postmeta")->where("post_id", $post_id)->where("meta_key", "view_auth_level")->first();
@@ -180,7 +184,8 @@ function is_readable_post($post_id, $current_user_id) {
     return (is_null($view_auth_term_id)) || ($progress_level >= $view_auth_level);
 }
 
-function progress_level($data) {
+function progress_level($data)
+{
     $body = $data -> get_params();
     $capsule = new Capsule;
     $view_auth_level_postmeta = $capsule::table("postmeta")->where("post_id", $body["post_id"])->where("meta_key", "view_auth_level")->first();
@@ -199,7 +204,8 @@ function progress_level($data) {
                 [
                     "term_id" => $view_auth_term_id,
                     "user_id" => $current_user_id,
-                ], [
+                ],
+                [
                     "level" => $next_level,
                 ]
             );
