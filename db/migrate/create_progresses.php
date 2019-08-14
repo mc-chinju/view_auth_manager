@@ -3,7 +3,7 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 
 class CreateProgresses
 {
-    public static function change()
+    public static function execute()
     {
         $capsule = new Capsule;
         $schema = $capsule->schema();

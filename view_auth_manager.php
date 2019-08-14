@@ -18,7 +18,7 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 
 function migrate()
 {
-    CreateProgresses::change();
+    CreateProgresses::execute();
 }
 
 function seed()
@@ -141,14 +141,13 @@ function set_toastr_for_general()
     wp_enqueue_script("toastr_redirected_js", plugins_url("js/toastr_redirected.js", __FILE__), array( "jquery" ), false, true);
 }
 
-add_action("wp_ajax_update_post_metadata", "update_post_metadata");
-add_action("wp_ajax_nopriv_update_post_metadata", "update_post_metadata");
-
 register_activation_hook(__FILE__, "migrate");
 register_activation_hook(__FILE__, "seed");
 register_deactivation_hook(__FILE__, "drop");
 add_action("admin_menu", "add_plugin_admin_menu");
 add_action("template_redirect", "before_action_show_post");
-add_action("admin_enqueue_scripts", "enqueue_vam_ajax_script");
-add_action("admin_enqueue_scripts", "set_toastr_for_admin");
 add_action("wp_enqueue_scripts", "set_toastr_for_general");
+add_action("admin_enqueue_scripts", "set_toastr_for_admin");
+add_action("admin_enqueue_scripts", "enqueue_vam_ajax_script");
+add_action("wp_ajax_update_post_metadata", "update_post_metadata");
+add_action("wp_ajax_nopriv_update_post_metadata", "update_post_metadata");
