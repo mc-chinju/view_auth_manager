@@ -13,7 +13,7 @@ jQuery(function($) {
       }
     }).done(function(response) {
       console.log(response);
-      toastr.info(response["message"]);
+      // toastr.info(response["message"]);
     });
   });
 });
